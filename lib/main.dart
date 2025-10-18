@@ -1,16 +1,15 @@
 import 'package:device_preview/device_preview.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
-  runApp(
-    DevicePreview(
-      enabled: !kReleaseMode,
-      builder: (context) => const ChallengeApp(),
-    ),
-  );
-}
+void main() => runApp(
+  DevicePreview(
+    enabled: !kReleaseMode,
+    builder: (context) => const ChallengeApp(),
+  ),
+);
 
 class ChallengeApp extends StatefulWidget {
   const ChallengeApp({super.key});
@@ -30,18 +29,18 @@ class _ChallengeAppState extends State<ChallengeApp> {
 
   Future<void> _loadTheme() async {
     final prefs = await SharedPreferences.getInstance();
+    if (!mounted) return;
     final isDark = prefs.getBool('isDarkMode') ?? false;
     setState(() {
       _themeMode = isDark ? ThemeMode.dark : ThemeMode.light;
     });
   }
 
-  Future<void> _toggleTheme() async {
+  void _toggleTheme() async {
     final prefs = await SharedPreferences.getInstance();
-    final isDark = _themeMode == ThemeMode.dark;
-    await prefs.setBool('isDarkMode', !isDark);
     setState(() {
-      _themeMode = !isDark ? ThemeMode.dark : ThemeMode.light;
+      _themeMode = _themeMode == ThemeMode.light ? ThemeMode.dark : ThemeMode.light;
+      prefs.setBool('isDarkMode', _themeMode == ThemeMode.dark);
     });
   }
 
@@ -51,404 +50,295 @@ class _ChallengeAppState extends State<ChallengeApp> {
       useInheritedMediaQuery: true,
       locale: DevicePreview.locale(context),
       builder: DevicePreview.appBuilder,
-      title: 'All Challenges',
+      title: 'Community Challenges',
       debugShowCheckedModeBanner: false,
       themeMode: _themeMode,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigoAccent),
+        brightness: Brightness.light,
+        scaffoldBackgroundColor: const Color(0xFFFBF0F4),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF91736B)),
+        textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
         useMaterial3: true,
       ),
-      darkTheme: ThemeData.dark(useMaterial3: true),
-      home: AllChallengesPage(toggleTheme: _toggleTheme, isDark: _themeMode == ThemeMode.dark),
+      darkTheme: ThemeData(
+        brightness: Brightness.dark,
+        scaffoldBackgroundColor: const Color(0xFF1c1c1e),
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFF91736B),
+          brightness: Brightness.dark,
+        ),
+        textTheme: GoogleFonts.interTextTheme(ThemeData.dark().textTheme.apply(bodyColor: Colors.white70, displayColor: Colors.white70)),
+        useMaterial3: true,
+      ),
+      home: CommunityPage(toggleTheme: _toggleTheme),
     );
   }
 }
 
-class AllChallengesPage extends StatefulWidget {
+class CommunityPage extends StatefulWidget {
   final VoidCallback toggleTheme;
-  final bool isDark;
-
-  const AllChallengesPage({
-    super.key,
-    required this.toggleTheme,
-    required this.isDark,
-  });
+  const CommunityPage({super.key, required this.toggleTheme});
 
   @override
-  State<AllChallengesPage> createState() => _AllChallengesPageState();
+  State<CommunityPage> createState() => _CommunityPageState();
 }
 
-class _AllChallengesPageState extends State<AllChallengesPage> {
-  String selectedCategory = 'All';
-  final List<String> categories = [
-    'All',
-    'Spending Swap',
-    'Health + Money',
-    'Goal-Driven',
-    'Social & Community',
-    'Seasonal'
-  ];
-
-  final List<Map<String, dynamic>> challenges = [
-    {
-      "id": "brew_at_home_week",
-      "title": "Brew-at-Home Week",
-      "description":
-      "No takeaway coffee for 7 days — save £15 and build a mindful morning routine.",
-      "duration_days": 7,
-      "suggested_savings": 15,
-      "category": "Health + Money",
-      "type": "solo/community",
-      "active": true,
-      "badge": "Coffee Cutter",
-      "streak_points": 10,
-      "image": "https://images.unsplash.com/photo-1545665225-b23b99e4d45e?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      "id": "no_takeout_tuesdays",
-      "title": "No Takeout Tuesdays",
-      "description": "Cook at home once a week — save £10+ per meal.",
-      "duration_days": 7,
-      "suggested_savings": 12,
-      "category": "Spending Swap",
-      "type": "solo",
-      "active": true,
-      "badge": "Home Chef",
-      "streak_points": 8,
-      "image": "https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?q=80&w=1981&auto=format&fit=crop"
-    },
-    {
-      "id": "goal_streak_7days",
-      "title": "Goal Streak: 7 Days of Saving",
-      "description": "Add £1 daily to your savings for 7 days — build consistency.",
-      "duration_days": 7,
-      "suggested_savings": 7,
-      "category": "Goal-Driven",
-      "type": "solo",
-      "active": true,
-      "badge": "Saver Starter",
-      "streak_points": 7,
-      "image": "https://images.unsplash.com/photo-1563013544-824ae1b704d3?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      "id": "save_together_mode",
-      "title": "Save Together Mode",
-      "description": "Join friends to save £100 together for a trip or shared goal.",
-      "duration_days": 14,
-      "suggested_savings": 100,
-      "category": "Social & Community",
-      "type": "community",
-      "active": true,
-      "badge": "Team Saver",
-      "streak_points": 15,
-      "image": "https://images.unsplash.com/photo-1531545514256-b1400bc00f31?q=80&w=1974&auto=format&fit=crop"
-    },
-    {
-      "id": "cancel_and_save",
-      "title": "Cancel & Save",
-      "description": "Pause one unused subscription this month — save £7–£15 instantly.",
-      "duration_days": 30,
-      "suggested_savings": 15,
-      "category": "Spending Swap",
-      "type": "solo",
-      "active": true,
-      "badge": "Subscription Slayer",
-      "streak_points": 12,
-      "image": "https://images.unsplash.com/photo-1579621970795-87f91d908377?q=80&w=1974&auto=format&fit=crop"
-    },
-    {
-      "id": "no_spend_streak",
-      "title": "3-Day No Spend Streak",
-      "description": "Buy nothing but essentials for 3 days — test your willpower!",
-      "duration_days": 3,
-      "suggested_savings": 20,
-      "category": "Spending Swap",
-      "type": "solo",
-      "active": true,
-      "badge": "Willpower Warrior",
-      "streak_points": 5,
-      "image": "https://images.unsplash.com/photo-1599056030514-92a15a55d212?q=80&w=1974&auto=format&fit=crop"
-    },
-    {
-      "id": "ditch_the_delivery",
-      "title": "Ditch the Delivery",
-      "description": "Bring lunch from home 3 days a week — save £18+ and skip 1,200+ calories.",
-      "duration_days": 7,
-      "suggested_savings": 18,
-      "category": "Health + Money",
-      "type": "solo",
-      "active": true,
-      "badge": "Lunchpack Leader",
-      "streak_points": 9,
-      "image": "https://images.unsplash.com/photo-1587594248383-a7a7a5f87b8d?q=80&w=1974&auto=format&fit=crop"
-    },
-    {
-      "id": "fast_25_challenge",
-      "title": "Fast £25 Challenge",
-      "description": "Save £25 in one week by skipping small daily spends.",
-      "duration_days": 7,
-      "suggested_savings": 25,
-      "category": "Goal-Driven",
-      "type": "solo",
-      "active": true,
-      "badge": "Quick Saver",
-      "streak_points": 10,
-      "image": "https://images.unsplash.com/photo-1496065187959-7f07b8353c55?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      "id": "group_no_spend_weekend",
-      "title": "Group No-Spend Weekend",
-      "description": "Everyone buys only essentials from Fri–Sun — see who lasts longest!",
-      "duration_days": 3,
-      "suggested_savings": 15,
-      "category": "Social & Community",
-      "type": "community",
-      "active": true,
-      "badge": "Weekend Winner",
-      "streak_points": 8,
-      "image": "https://images.unsplash.com/photo-1559825481-7d453c9a0937?q=80&w=2070&auto=format&fit=crop"
-    },
-    {
-      "id": "dry_january_wallet",
-      "title": "Dry January Wallet",
-      "description": "Skip alcohol for 2 weeks, save £30.",
-      "duration_days": 14,
-      "suggested_savings": 30,
-      "category": "Seasonal",
-      "type": "solo",
-      "active": true,
-      "badge": "Sober Saver",
-      "streak_points": 15,
-      "image": "https://images.unsplash.com/photo-1548839140-29a74da3aa8d?q=80&w=1974&auto=format&fit=crop"
-    },
-  ];
-
-  List<Map<String, dynamic>> joinedChallenges = [];
+class _CommunityPageState extends State<CommunityPage> {
+  int selectedIndex = 3; // Community tab active
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, dynamic>> filteredChallenges = selectedCategory == 'All'
-        ? challenges
-        : challenges.where((c) => c['category'] == selectedCategory).toList();
+    final theme = Theme.of(context);
+    final accent = theme.colorScheme.primary;
+    final isDark = theme.brightness == Brightness.dark;
+    final cardColor = isDark ? const Color(0xFF2c2c2e) : Colors.white;
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('All Challenges'),
+        backgroundColor: theme.scaffoldBackgroundColor,
+        elevation: 0,
+        title: Text("Community", style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
         centerTitle: true,
+        leading: const Padding(
+          padding: EdgeInsets.only(left: 16),
+          child: CircleAvatar(
+            backgroundImage: NetworkImage(
+                'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e'), // sample profile photo
+          ),
+        ),
         actions: [
           IconButton(
-            icon: Icon(widget.isDark ? Icons.dark_mode : Icons.light_mode),
+            icon: Icon(isDark ? Icons.light_mode_outlined : Icons.dark_mode_outlined),
             onPressed: widget.toggleTheme,
           ),
         ],
       ),
-      body: Column(
-        children: [
-          SizedBox(
-            height: 50,
-            child: ListView.builder(
-              scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
-              itemBuilder: (context, index) {
-                final category = categories[index];
-                final selected = selectedCategory == category;
-                return GestureDetector(
-                  onTap: () {
-                    setState(() {
-                      selectedCategory = category;
-                    });
-                  },
-                  child: Container(
-                    margin: const EdgeInsets.symmetric(horizontal: 8, vertical: 10),
-                    padding: const EdgeInsets.symmetric(horizontal: 16),
-                    decoration: BoxDecoration(
-                      color: selected
-                          ? Theme.of(context).colorScheme.primary
-                          : Colors.grey[300],
-                      borderRadius: BorderRadius.circular(20),
-                    ),
-                    alignment: Alignment.center,
-                    child: Text(
-                      category,
-                      style: TextStyle(
-                        color: selected ? Colors.white : Colors.black87,
-                        fontWeight: FontWeight.w600,
-                      ),
-                    ),
-                  ),
-                );
-              },
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Container(
+              decoration: BoxDecoration(
+                color: cardColor,
+                borderRadius: BorderRadius.circular(30),
+              ),
+              padding: const EdgeInsets.all(4),
+              child: Row(
+                children: [
+                  _buildTabButton("Leaderboard", false, accent, isDark),
+                  _buildTabButton("Club Goals", false, accent, isDark),
+                  _buildTabButton("Challenges", true, accent, isDark),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: filteredChallenges.length,
-              itemBuilder: (context, index) {
-                final challenge = filteredChallenges[index];
-                bool isJoined = joinedChallenges.contains(challenge);
-                final imageUrl = challenge['image'] as String?;
+            const SizedBox(height: 20),
+            Container(
+              width: double.infinity,
+              padding: const EdgeInsets.all(16),
+              decoration: BoxDecoration(
+                borderRadius: BorderRadius.circular(16),
+                border: Border.all(color: accent.withOpacity(0.6)),
+                color: cardColor,
+              ),
+              child: Center(
+                child: Text(
+                  "Create a Challenge",
+                  style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: theme.colorScheme.onSurface),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text("My Challenges",
+                style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold, color: accent)),
+            const SizedBox(height: 12),
+            Row(
+              children: [
+                Expanded(
+                  child: _buildMyChallengeCard(
+                    theme,
+                    title: "No Takeout Week",
+                    description: "Ditch delivery for a week and save",
+                    progress: 0.6,
+                    saveText: "Save: £40",
+                    trophyPoints: 20,
+                    icon: Icons.restaurant_outlined,
+                  ),
+                ),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: _buildMyChallengeCard(
+                    theme,
+                    title: "Skip coffee",
+                    description: "Brew at home and save",
+                    progress: 0.8,
+                    saveText: "Save: £20",
+                    trophyPoints: 20,
+                    icon: Icons.coffee_outlined,
+                  ),
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
+            Text("Challenge Categories",
+                style: TextStyle(
+                    fontSize: 18, fontWeight: FontWeight.bold, color: accent)),
+            const SizedBox(height: 16),
+            _buildCategoryTitle("💸 Spending Swap Challenges", accent),
+            const SizedBox(height: 8),
+            _buildChallengeRow(
+              theme,
+              leftTitle: "Skip the Uber",
+              leftDesc: "Walk or cycle 3 short trips this week — save £20 + stay active!",
+              rightTitle: "3 Day No Spend Streak",
+              rightDesc: "Buy nothing but essentials for 3 days — track your willpower!",
+            ),
 
-                return Card(
-                  margin: const EdgeInsets.all(10),
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  clipBehavior: Clip.antiAlias,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      if (imageUrl != null && imageUrl.isNotEmpty)
-                        Image.network(
-                          imageUrl,
-                          height: 150,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (BuildContext context, Widget child, ImageChunkEvent? loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              height: 150,
-                              color: Colors.grey[300],
-                              child: Center(
-                                child: CircularProgressIndicator(
-                                  value: loadingProgress.expectedTotalBytes != null
-                                      ? loadingProgress.cumulativeBytesLoaded / loadingProgress.expectedTotalBytes!
-                                      : null,
-                                ),
-                              ),
-                            );
-                          },
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 150,
-                              width: double.infinity,
-                              color: Colors.grey[300],
-                              child: const Icon(Icons.broken_image, color: Colors.grey, size: 48),
-                            );
-                          },
-                        )
-                      else
-                        Container(
-                          height: 150,
-                          width: double.infinity,
-                          color: Colors.grey[300],
-                          child: const Center(
-                            child: Icon(Icons.image_not_supported, color: Colors.grey, size: 48),
-                          ),
-                        ),
-                      Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              challenge['title'] ?? 'No title',
-                              style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(challenge['description'] ?? 'No description', style: const TextStyle(fontSize: 14)),
-                            const SizedBox(height: 8),
-                            Row(
-                              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                              children: [
-                                Text("Duration: ${challenge['duration_days'] ?? 0} days"),
-                                Text("Save: £${challenge['suggested_savings'] ?? 0}"),
-                              ],
-                            ),
-                            const SizedBox(height: 10),
-                            isJoined
-                                ? ProgressSection(
-                              challenge: challenge,
-                              onReset: () {
-                                setState(() {
-                                  joinedChallenges.remove(challenge);
-                                });
-                              },
-                            )
-                                : ElevatedButton(
-                              onPressed: () {
-                                setState(() {
-                                  joinedChallenges.add(challenge);
-                                });
-                              },
-                              style: ElevatedButton.styleFrom(
-                                minimumSize: const Size(double.infinity, 40),
-                              ),
-                              child: const Text("Join Challenge"),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                );
-              },
+            const SizedBox(height: 24),
+            _buildCategoryTitle("💰 Health + Money Challenges", accent),
+            const SizedBox(height: 8),
+            _buildChallengeRow(
+              theme,
+              leftTitle: "Skip Sugary Snacks",
+              leftDesc: "No vending snacks for 5 days — save £6 and break the habit!",
+              rightTitle: "Ditch the Delivery",
+              rightDesc: "Bring lunch from home 3 days — save £18+ and stay healthy!",
             ),
+          ],
+        ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: selectedIndex,
+        selectedItemColor: accent,
+        unselectedItemColor: Colors.grey,
+        backgroundColor: isDark ? const Color(0xFF2c2c2e) : Colors.white,
+        type: BottomNavigationBarType.fixed,
+        onTap: (index) => setState(() => selectedIndex = index),
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), label: "Dashboard"),
+          BottomNavigationBarItem(icon: Icon(Icons.flag_outlined), label: "Goal"),
+          BottomNavigationBarItem(icon: Icon(Icons.savings_outlined), label: "Save"),
+          BottomNavigationBarItem(icon: Icon(Icons.groups_3_outlined), label: "Community"),
+          BottomNavigationBarItem(icon: Icon(Icons.local_offer_outlined), label: "Offer"),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTabButton(String text, bool selected, Color accent, bool isDark) {
+    return Expanded(
+      child: Container(
+        decoration: BoxDecoration(
+          color: selected ? accent : Colors.transparent,
+          borderRadius: BorderRadius.circular(25),
+        ),
+        padding: const EdgeInsets.symmetric(vertical: 10),
+        alignment: Alignment.center,
+        child: Text(
+          text,
+          style: TextStyle(
+            color: selected ? Colors.white : (isDark ? Colors.white70 : Colors.black87),
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildMyChallengeCard(ThemeData theme,
+      {required String title,
+      required String description,
+      required double progress,
+      required String saveText,
+      required int trophyPoints,
+      required IconData icon}) {
+    final cardColor = theme.brightness == Brightness.dark ? const Color(0xFF2c2c2e) : Colors.white;
+    final accent = theme.colorScheme.primary;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(16),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+            Icon(icon, color: accent),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Text(title,
+                style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: theme.colorScheme.onSurface)
+              ),
+            ),
+          ]),
+          const SizedBox(height: 6),
+          Text(description, style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withOpacity(0.7))),
+          const SizedBox(height: 6),
+          LinearProgressIndicator(value: progress, backgroundColor: Colors.grey.shade300, color: accent),
+          const SizedBox(height: 6),
+          Text(saveText, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface)),
+          const SizedBox(height: 4),
+          Row(
+            children: [
+              Icon(Icons.emoji_events_outlined, size: 16, color: accent),
+              const SizedBox(width: 4),
+              Text('$trophyPoints', style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
+            ],
           ),
         ],
       ),
     );
   }
-}
 
-class ProgressSection extends StatefulWidget {
-  final Map<String, dynamic> challenge;
-  final VoidCallback onReset;
-
-  const ProgressSection({super.key, required this.challenge, required this.onReset});
-
-  @override
-  State<ProgressSection> createState() => _ProgressSectionState();
-}
-
-class _ProgressSectionState extends State<ProgressSection> {
-  int daysCompleted = 0;
-  double totalSaved = 0.0;
-
-  void markDayComplete() {
-    if (daysCompleted < (widget.challenge['duration_days'] ?? 0)) {
-      setState(() {
-        daysCompleted++;
-        totalSaved += (widget.challenge['suggested_savings'] ?? 0) / (widget.challenge['duration_days'] ?? 1);
-      });
-    }
+  Widget _buildCategoryTitle(String title, Color accent) {
+    return Text(title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: accent));
   }
 
-  @override
-  Widget build(BuildContext context) {
-    final duration = widget.challenge['duration_days'] ?? 0;
-    bool challengeDone = duration > 0 && daysCompleted >= duration;
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
+  Widget _buildChallengeRow(ThemeData theme,
+      {required String leftTitle,
+      required String leftDesc,
+      required String rightTitle,
+      required String rightDesc}) {
+    return Row(
       children: [
-        const SizedBox(height: 6),
-        LinearProgressIndicator(
-          value: duration > 0 ? daysCompleted / duration : 0.0,
-          color: Colors.green,
-          backgroundColor: Colors.grey[300],
-        ),
-        const SizedBox(height: 8),
-        Text("Progress: $daysCompleted of $duration days",
-            style: const TextStyle(fontSize: 14)),
-        Text("Saved so far: £${totalSaved.toStringAsFixed(2)}"),
-        const SizedBox(height: 8),
-        if (!challengeDone)
-          ElevatedButton.icon(
-            onPressed: markDayComplete,
-            icon: const Icon(Icons.check),
-            label: const Text("Did you complete today?"),
-          )
-        else
+        Expanded(child: _buildSmallChallengeCard(theme, leftTitle, leftDesc)),
+        const SizedBox(width: 12),
+        Expanded(child: _buildSmallChallengeCard(theme, rightTitle, rightDesc)),
+      ],
+    );
+  }
+
+  Widget _buildSmallChallengeCard(ThemeData theme, String title, String desc) {
+    final cardColor = theme.brightness == Brightness.dark ? const Color(0xFF2c2c2e) : Colors.white;
+    final accent = theme.colorScheme.primary;
+
+    return Container(
+      padding: const EdgeInsets.all(14),
+      decoration: BoxDecoration(
+        color: cardColor,
+        borderRadius: BorderRadius.circular(14),
+      ),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: theme.colorScheme.onSurface)),
+          const SizedBox(height: 6),
+          Text(desc, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withOpacity(0.7))),
+          const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text("🎉 Challenge Completed!", style: TextStyle(fontWeight: FontWeight.bold)),
-              Text("🏅 ${widget.challenge['badge'] ?? ''}"),
+              Row(children: [Icon(Icons.groups_outlined, size: 16), const SizedBox(width: 4), Text("12", style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withOpacity(0.7)))]),
+              Row(children: [Icon(Icons.emoji_events_outlined, size: 16, color: accent), const SizedBox(width: 4), Text("20", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: accent))]),
             ],
-          ),
-        const SizedBox(height: 6),
-        TextButton(onPressed: widget.onReset, child: const Text("Leave Challenge")),
-      ],
+          )
+        ],
+      ),
     );
   }
 }
