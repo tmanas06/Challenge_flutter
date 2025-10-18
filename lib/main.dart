@@ -14,8 +14,8 @@ class ChallengeApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         brightness: Brightness.light,
-        scaffoldBackgroundColor: const Color(0xFFFBF0F4),
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF91736B)),
+        scaffoldBackgroundColor: Colors.white,
+        colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
         textTheme: GoogleFonts.interTextTheme(textTheme),
         useMaterial3: true,
       ),
@@ -44,113 +44,149 @@ class _CommunityPageState extends State<CommunityPage> {
       appBar: AppBar(
         backgroundColor: theme.scaffoldBackgroundColor,
         elevation: 0,
-        title: Text("Community", style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
+        title: Text("Community",
+            style: TextStyle(
+                fontWeight: FontWeight.bold,
+                color: theme.colorScheme.onSurface)),
         centerTitle: true,
         leading: const Padding(
           padding: EdgeInsets.only(left: 16),
           child: CircleAvatar(
-            backgroundImage: NetworkImage('https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e'),
+            backgroundImage: NetworkImage(
+                'https://images.unsplash.com/photo-1529626455594-4ff0802cfb7e'),
           ),
         ),
       ),
-      body: SingleChildScrollView(
+      body: ListView(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            ChallengeTabs(
-              selectedIndex: _selectedTabIndex,
-              onTabSelected: (index) {
-                setState(() {
-                  _selectedTabIndex = index;
-                });
-              },
-            ),
-            const SizedBox(height: 20),
-            const CreateChallengeButton(),
-            const SizedBox(height: 24),
-            Text("My Challenges", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: accent)),
-            const SizedBox(height: 12),
-            const Row(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Expanded(
-                  child: MyChallengeCard(
-                    title: "No Takeout Week",
-                    description: "Ditch delivery for a week and save",
-                    progress: 0.6,
-                    saveText: "Save: £40",
-                    trophyPoints: 20,
-                    icon: Icons.restaurant_outlined,
-                  ),
+        physics: const AlwaysScrollableScrollPhysics(),
+        children: [
+          ChallengeTabs(
+            selectedIndex: _selectedTabIndex,
+            onTabSelected: (index) {
+              setState(() {
+                _selectedTabIndex = index;
+              });
+            },
+          ),
+          const SizedBox(height: 20),
+          const CreateChallengeButton(),
+          const SizedBox(height: 24),
+          Text("My Challenges",
+              style: TextStyle(
+                  fontSize: 18, fontWeight: FontWeight.bold, color: accent)),
+          const SizedBox(height: 12),
+          Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: const [
+              Flexible(
+                child: MyChallengeCard(
+                  title: "No Takeout Week",
+                  description: "Ditch delivery for a week and save",
+                  progress: 0.6,
+                  saveText: "Save: £40",
+                  trophyPoints: 20,
+                  icon: Icons.restaurant_outlined,
                 ),
-                SizedBox(width: 12),
-                Expanded(
-                  child: MyChallengeCard(
-                    title: "Skip coffee",
-                    description: "Brew at home and save",
-                    progress: 0.8,
-                    saveText: "Save: £20",
-                    trophyPoints: 20,
-                    icon: Icons.coffee_outlined,
-                  ),
+              ),
+              SizedBox(width: 12),
+              Flexible(
+                child: MyChallengeCard(
+                  title: "Skip coffee",
+                  description: "Brew at home and save",
+                  progress: 0.8,
+                  saveText: "Save: £20",
+                  trophyPoints: 20,
+                  icon: Icons.coffee_outlined,
                 ),
-              ],
-            ),
-            const SizedBox(height: 24),
-            Text("Challenge Categories", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: accent)),
-            const SizedBox(height: 16),
-            CategorySection(
-              title: "💸 Spending Swap Challenges",
-              challenges: const [
-                SmallChallengeCard(
-                    title: "Skip the Uber",
-                    description: "Walk or cycle 3 short trips this week — save £20 + stay active!"),
-                SmallChallengeCard(
-                    title: "3 Day No Spend Streak",
-                    description: "Buy nothing but essentials for 3 days — track your willpower!"),
-              ],
-            ),
-            const SizedBox(height: 24),
-            CategorySection(
-              title: "💰 Health + Money Challenges",
-              challenges: const [
-                SmallChallengeCard(
-                    title: "Skip Sugary Snacks",
-                    description: "No vending snacks for 5 days — save £6 and break the habit!"),
-                SmallChallengeCard(
-                    title: "Ditch the Delivery",
-                    description: "Bring lunch from home 3 days — save £18+ and stay healthy!"),
-              ],
-            ),
-            const SizedBox(height: 24),
-            CategorySection(
-              title: "🎯 Goal-Driven Challenges",
-              challenges: const [
-                SmallChallengeCard(
-                    title: "Fast £25 Challenge",
-                    description: "Save £25 in one week by skipping small daily spends."),
-                SmallChallengeCard(
-                    title: "Payday Split",
-                    description: "Move 10% of your next income to your goal fund."),
-              ],
-            ),
-          ],
-        ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          CategorySection(
+            title: "💸 Spending Swap Challenges",
+            challenges: const [
+              SmallChallengeCard(
+                  title: "Skip the Uber",
+                  description:
+                  "Walk or cycle 3 short trips this week — save £20 + stay active!"),
+              SmallChallengeCard(
+                  title: "3 Day No Spend Streak",
+                  description:
+                  "Buy nothing but essentials for 3 days — track your willpower!"),
+            ],
+          ),
+          const SizedBox(height: 24),
+          CategorySection(
+            title: "💰 Health + Money Challenges",
+            challenges: const [
+              SmallChallengeCard(
+                  title: "Skip Sugary Snacks",
+                  description:
+                  "No vending snacks for 5 days — save £6 and break the habit!"),
+              SmallChallengeCard(
+                  title: "Ditch the Delivery",
+                  description:
+                  "Bring lunch from home 3 days — save £18+ and stay healthy!"),
+            ],
+          ),
+          const SizedBox(height: 24),
+          CategorySection(
+            title: "🎯 Goal-Driven Challenges",
+            challenges: const [
+              SmallChallengeCard(
+                  title: "Fast £25 Challenge",
+                  description:
+                  "Save £25 in one week by skipping small daily spends."),
+              SmallChallengeCard(
+                  title: "Payday Split",
+                  description: "Move 10% of your next income to your goal fund."),
+            ],
+          ),
+          const SizedBox(height: 24),
+          CategorySection(
+            title: "👥 Social & Community Challenges",
+            challenges: const [
+              SmallChallengeCard(
+                  title: "Coffee Crew Challenge",
+                  description:
+                  "5 people, 5 days, no takeout coffee. Team streak wins!"),
+              SmallChallengeCard(
+                  title: "Shared Goal Challenge",
+                  description: "Pick a goal and hit the target as a team."),
+            ],
+          ),
+          const SizedBox(height: 24),
+          CategorySection(
+            title: "🍂 Seasonal Challenges",
+            challenges: const [
+              SmallChallengeCard(
+                  title: "Autumn No-Spend",
+                  description: "Enjoy the free autumn activities for a weekend."),
+              SmallChallengeCard(
+                  title: "Festive Fund Boost",
+                  description: "Save £2 a day for the festive season."),
+            ],
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _bottomNavIndex,
-        selectedItemColor: accent,
+        selectedItemColor: Colors.green,
         unselectedItemColor: Colors.grey,
         backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
         onTap: (index) => setState(() => _bottomNavIndex = index),
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), label: "Dashboard"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.dashboard_outlined), label: "Dashboard"),
           BottomNavigationBarItem(icon: Icon(Icons.flag_outlined), label: "Goal"),
-          BottomNavigationBarItem(icon: Icon(Icons.savings_outlined), label: "Save"),
-          BottomNavigationBarItem(icon: Icon(Icons.groups_3_outlined), label: "Community"),
-          BottomNavigationBarItem(icon: Icon(Icons.local_offer_outlined), label: "Offer"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.savings_outlined), label: "Save"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.groups_3_outlined), label: "Community"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.local_offer_outlined), label: "Offer"),
         ],
       ),
     );
@@ -167,8 +203,7 @@ class ChallengeTabs extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final accent = theme.colorScheme.primary;
+    final accent = Colors.green; // selected tab color
 
     return Container(
       decoration: BoxDecoration(
@@ -199,7 +234,10 @@ class ChallengeTabs extends StatelessWidget {
           ),
           padding: const EdgeInsets.symmetric(vertical: 10),
           alignment: Alignment.center,
-          child: Text(text, style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.w600)),
+          child: Text(text,
+              style: TextStyle(
+                  color: isSelected ? Colors.white : Colors.black87,
+                  fontWeight: FontWeight.w600)),
         ),
       ),
     );
@@ -218,11 +256,14 @@ class CreateChallengeButton extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: theme.colorScheme.primary.withOpacity(0.6)),
+        border: Border.all(color: Colors.grey.shade300),
       ),
       child: Center(
         child: Text("Create a Challenge",
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16, color: theme.colorScheme.onSurface)),
+            style: TextStyle(
+                fontWeight: FontWeight.w600,
+                fontSize: 16,
+                color: theme.colorScheme.onSurface)),
       ),
     );
   }
@@ -248,8 +289,8 @@ class MyChallengeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = Colors.green; // icon color
     final theme = Theme.of(context);
-    final accent = theme.colorScheme.primary;
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -267,21 +308,36 @@ class MyChallengeCard extends StatelessWidget {
               Icon(icon, color: accent),
               const SizedBox(width: 8),
               Expanded(
-                  child: Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 15, color: theme.colorScheme.onSurface))),
+                  child: Text(title,
+                      style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                          color: theme.colorScheme.onSurface))),
             ],
           ),
           const SizedBox(height: 6),
-          Text(description, style: TextStyle(fontSize: 13, color: theme.colorScheme.onSurface.withOpacity(0.7))),
+          Text(description,
+              style: TextStyle(
+                  fontSize: 13,
+                  color: theme.colorScheme.onSurface.withOpacity(0.7))),
           const SizedBox(height: 6),
-          LinearProgressIndicator(value: progress, backgroundColor: Colors.grey.shade300, color: accent),
+          LinearProgressIndicator(
+              value: progress, backgroundColor: Colors.grey.shade300, color: accent),
           const SizedBox(height: 6),
-          Text(saveText, style: TextStyle(fontSize: 13, fontWeight: FontWeight.w600, color: theme.colorScheme.onSurface)),
+          Text(saveText,
+              style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                  color: theme.colorScheme.onSurface)),
           const SizedBox(height: 4),
           Row(
             children: [
               Icon(Icons.emoji_events_outlined, size: 16, color: accent),
               const SizedBox(width: 4),
-              Text('$trophyPoints', style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
+              Text('$trophyPoints',
+                  style: TextStyle(
+                      fontWeight: FontWeight.bold,
+                      color: theme.colorScheme.onSurface)),
             ],
           ),
         ],
@@ -298,12 +354,11 @@ class CategorySection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final accent = theme.colorScheme.primary;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: accent)),
+        Text(title,
+            style: const TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: Colors.black)),
         const SizedBox(height: 8),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -326,8 +381,8 @@ class SmallChallengeCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final accent = Colors.green;
     final theme = Theme.of(context);
-    final accent = theme.colorScheme.primary;
     return Container(
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
@@ -338,9 +393,15 @@ class SmallChallengeCard extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(title, style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: theme.colorScheme.onSurface)),
+          Text(title,
+              style: TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 14,
+                  color: theme.colorScheme.onSurface)),
           const SizedBox(height: 6),
-          Text(description, style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withOpacity(0.7))),
+          Text(description,
+              style: TextStyle(
+                  fontSize: 12, color: theme.colorScheme.onSurface.withOpacity(0.7))),
           const SizedBox(height: 10),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -348,12 +409,19 @@ class SmallChallengeCard extends StatelessWidget {
               Row(children: [
                 const Icon(Icons.groups_outlined, size: 16),
                 const SizedBox(width: 4),
-                Text("12", style: TextStyle(fontSize: 12, color: theme.colorScheme.onSurface.withOpacity(0.7)))
+                Text("12",
+                    style: TextStyle(
+                        fontSize: 12,
+                        color: theme.colorScheme.onSurface.withOpacity(0.7)))
               ]),
               Row(children: [
                 Icon(Icons.emoji_events_outlined, size: 16, color: accent),
                 const SizedBox(width: 4),
-                Text("20", style: TextStyle(fontWeight: FontWeight.bold, fontSize: 12, color: accent))
+                Text("20",
+                    style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 12,
+                        color: accent))
               ]),
             ],
           )
