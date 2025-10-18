@@ -8,6 +8,7 @@ class ChallengeApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final textTheme = Theme.of(context).textTheme;
     return MaterialApp(
       title: 'Community Challenges',
       debugShowCheckedModeBanner: false,
@@ -15,7 +16,7 @@ class ChallengeApp extends StatelessWidget {
         brightness: Brightness.light,
         scaffoldBackgroundColor: const Color(0xFFFBF0F4),
         colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFF91736B)),
-        textTheme: GoogleFonts.interTextTheme(Theme.of(context).textTheme),
+        textTheme: GoogleFonts.interTextTheme(textTheme),
         useMaterial3: true,
       ),
       home: const CommunityPage(),
@@ -31,7 +32,8 @@ class CommunityPage extends StatefulWidget {
 }
 
 class _CommunityPageState extends State<CommunityPage> {
-  int selectedIndex = 3;
+  int _bottomNavIndex = 3;
+  int _selectedTabIndex = 2;
 
   @override
   Widget build(BuildContext context) {
@@ -56,13 +58,21 @@ class _CommunityPageState extends State<CommunityPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const ChallengeTabs(),
+            ChallengeTabs(
+              selectedIndex: _selectedTabIndex,
+              onTabSelected: (index) {
+                setState(() {
+                  _selectedTabIndex = index;
+                });
+              },
+            ),
             const SizedBox(height: 20),
             const CreateChallengeButton(),
             const SizedBox(height: 24),
             Text("My Challenges", style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: accent)),
             const SizedBox(height: 12),
             const Row(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Expanded(
                   child: MyChallengeCard(
@@ -113,16 +123,28 @@ class _CommunityPageState extends State<CommunityPage> {
                     description: "Bring lunch from home 3 days — save £18+ and stay healthy!"),
               ],
             ),
+            const SizedBox(height: 24),
+            CategorySection(
+              title: "🎯 Goal-Driven Challenges",
+              challenges: const [
+                SmallChallengeCard(
+                    title: "Fast £25 Challenge",
+                    description: "Save £25 in one week by skipping small daily spends."),
+                SmallChallengeCard(
+                    title: "Payday Split",
+                    description: "Move 10% of your next income to your goal fund."),
+              ],
+            ),
           ],
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectedIndex,
+        currentIndex: _bottomNavIndex,
         selectedItemColor: accent,
         unselectedItemColor: Colors.grey,
         backgroundColor: Colors.white,
         type: BottomNavigationBarType.fixed,
-        onTap: (index) => setState(() => selectedIndex = index),
+        onTap: (index) => setState(() => _bottomNavIndex = index),
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), label: "Dashboard"),
           BottomNavigationBarItem(icon: Icon(Icons.flag_outlined), label: "Goal"),
@@ -138,7 +160,10 @@ class _CommunityPageState extends State<CommunityPage> {
 // --- Helper Widgets for a Cleaner Build Method ---
 
 class ChallengeTabs extends StatelessWidget {
-  const ChallengeTabs({super.key});
+  final int selectedIndex;
+  final ValueChanged<int> onTabSelected;
+
+  const ChallengeTabs({super.key, required this.selectedIndex, required this.onTabSelected});
 
   @override
   Widget build(BuildContext context) {
@@ -154,24 +179,28 @@ class ChallengeTabs extends StatelessWidget {
       padding: const EdgeInsets.all(4),
       child: Row(
         children: [
-          _buildTabButton("Leaderboard", false, accent),
-          _buildTabButton("Club Goals", false, accent),
-          _buildTabButton("Challenges", true, accent),
+          _buildTabButton("Leaderboard", 0, accent),
+          _buildTabButton("Club Goals", 1, accent),
+          _buildTabButton("Challenges", 2, accent),
         ],
       ),
     );
   }
 
-  Widget _buildTabButton(String text, bool selected, Color accent) {
+  Widget _buildTabButton(String text, int index, Color accent) {
+    final isSelected = selectedIndex == index;
     return Expanded(
-      child: Container(
-        decoration: BoxDecoration(
-          color: selected ? accent : Colors.transparent,
-          borderRadius: BorderRadius.circular(25),
+      child: GestureDetector(
+        onTap: () => onTabSelected(index),
+        child: Container(
+          decoration: BoxDecoration(
+            color: isSelected ? accent : Colors.transparent,
+            borderRadius: BorderRadius.circular(25),
+          ),
+          padding: const EdgeInsets.symmetric(vertical: 10),
+          alignment: Alignment.center,
+          child: Text(text, style: TextStyle(color: isSelected ? Colors.white : Colors.black87, fontWeight: FontWeight.w600)),
         ),
-        padding: const EdgeInsets.symmetric(vertical: 10),
-        alignment: Alignment.center,
-        child: Text(text, style: TextStyle(color: selected ? Colors.white : Colors.black87, fontWeight: FontWeight.w600)),
       ),
     );
   }
@@ -252,7 +281,7 @@ class MyChallengeCard extends StatelessWidget {
             children: [
               Icon(Icons.emoji_events_outlined, size: 16, color: accent),
               const SizedBox(width: 4),
-              Text('\$trophyPoints', style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
+              Text('$trophyPoints', style: TextStyle(fontWeight: FontWeight.bold, color: theme.colorScheme.onSurface)),
             ],
           ),
         ],
@@ -277,6 +306,7 @@ class CategorySection extends StatelessWidget {
         Text(title, style: TextStyle(fontWeight: FontWeight.w700, fontSize: 16, color: accent)),
         const SizedBox(height: 8),
         Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Expanded(child: challenges[0]),
             const SizedBox(width: 12),
